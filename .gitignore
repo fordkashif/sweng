@@ -1,0 +1,7 @@
+www/*
+*.pyc
+v/*
+.~*
+*.log
+make_modules/
+node_modules/
