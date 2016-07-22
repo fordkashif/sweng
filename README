@@ -1,0 +1,16 @@
+Livewire
+########
+
+
+# Setup
+
+1. To download all dependencies:
+```sh
+$ make
+```
+
+2. To have file recompiled as you go do:
+```sh
+$ gulp watch
+```
+
