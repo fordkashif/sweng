@@ -68,25 +68,26 @@ def errbodylook(num):
     qry = """
         with one as (
         select to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Streetlight') payload
-        from (select * from livewire.streetlight where polenumber ~* %(bam)s  limit 15) as foo
+        from (select * from livewire.streetlight where polenumber ~* %(bam)s  limit 5) as foo
         union all
         select to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Service Location')
-        from (select * from service.location where premises ~* %(bam)s  limit 15) as foo
+        from (select * from service.location where premises ~* %(bam)s  limit 5) as foo
         union all
         select to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Isolators')
-        from (select * from livewire.isolators where polenumber ~* %(bam)s or facilityid::text ~* %(bam)s  limit 15) as foo
+        from (select * from livewire.isolators where polenumber ~* %(bam)s or facilityid::text ~* %(bam)s  limit 5) as foo
         union all
         select to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Transformer')
-        from (select * from livewire.transformerbank where polenumber ~* %(bam)s or facilityid::text ~* %(bam)s  limit 15) as foo
+        from (select * from livewire.transformerbank where polenumber ~* %(bam)s or facilityid::text ~* %(bam)s  limit 5) as foo
         union all
         select to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Poles')
-        from (select * from livewire.pole where polenumber ~* %(bam)s limit 15) as foo)
+        from (select * from livewire.pole where polenumber ~* %(bam)s limit 5) as foo)
         select json_agg(payload)::text from one
         """
     num = '^' + num
     crs.execute(qry,{'bam':num})
-    return crs.fetchone()
-    
+    out = crs.fetchone()[0]
+    #print 'len is: ' + str(len(out))
+    return out
 
 
 

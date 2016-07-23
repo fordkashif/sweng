@@ -3,11 +3,11 @@ zzzz = riot.observable()
 zzzz.searchitems = []
 zzzz.searchNum = []
 zzzz.mapstats = {"livewire_version": .75}
-zzzz.results = ->
-    zzzz.searchNum = (x for x in url_for(errbodylook) when x.premises.match(new RegExp(@searchbox.value, 'i'))) 
-    zzzz.searchitems = (q for q in feeders.features when q.properties.Name.match(new RegExp(@searchbox.value, 'i')))
-    zzzz.searchitems = [] if @searchbox.value.length = 0
-
+#zzzz.results = ->
+#    zzzz.searchNum = (x for x in url_for(errbodylook) when x.premises.match(new RegExp(@searchbox.value, 'i'))) 
+#    zzzz.searchitems = (q for q in feeders.features when q.properties.Name.match(new RegExp(@searchbox.value, 'i')))
+#    zzzz.searchitems = [] if @searchbox.value.length = 0
+#
 zzzz.showitem = -> 
     zzzz.trigger('hideedgebar')
     zzzz.trigger('showobject',event.item)

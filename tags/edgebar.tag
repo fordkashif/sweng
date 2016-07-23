@@ -46,7 +46,11 @@
       margin: 0px;
       z-index: 500
     }
-      
+    .noresults  {
+    font-size: xx-large;
+    font-stretch: ultra-expanded;
+    color: red;
+}  
   </style>
   
   <span class="hidebar">
@@ -63,8 +67,15 @@
     <label class="mdl-textfield__label" for="sample1"></label>
   </div>
   
- 
-  <answer-box class="searchresult" info={ name } each={name, i in searchitems}></answer-box>
+  <div if={ searchitems.length > 0 }>
+  <answer-box class="searchresult" info={ name } each={ name, i in searchitems }></answer-box>
+  </div>
+  
+  <div class="noresults" if={ searchbox.value.length > 0 &&  searchitems.length == 0 } >
+    No results
+    
+  </div>
+  
   <!-- Checking if searchbox length is greater than five and searches for feedername -->
   
   <!--
@@ -80,12 +91,15 @@
     
     @results = =>
       
-      if @searchbox.value.length in [1..3]
-        return @searchitems = (q for q in feeders.features when q.properties.Name.match(new RegExp(@searchbox.value, 'i')))
+      if @searchbox.value is 0
+        return @searchitems = []
+      #if @searchbox.value.length in [1..3]
+      #  return @searchitems = (q for q in feeders.features when q.properties.Name.match(new RegExp(@searchbox.value, 'i')))
       url = "search/#{@searchbox.value}"
       req = new XMLHttpRequest()
       req.onload = =>
-        @searchitems = JSON.parse(req.responseText)
+        @searchitems = []
+        @searchitems = JSON.parse(req.responseText) if req.responseText.length > 0
         @.update()
       req.open("get", url, true)
       req.send()
@@ -101,7 +115,10 @@
     
     @hideedgebar = -> zzzz.trigger('hideedgebar')
     @on('mount', -> console.log('edgebar'))
-    zzzz.on('hideedgebar', => @searchbox.value = '') 
+    zzzz.on('hideedgebar', => 
+      @searchbox.value = ''
+      @searchitems = []
+      ) 
     zzzz.on('showEdgeBar', =>  @searchbox.focus())
     
     
