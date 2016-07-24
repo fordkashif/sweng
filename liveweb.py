@@ -42,23 +42,64 @@ def bounds(nwx,nwy,sex,sey,z):
 @route('/find/<gid>')
 def find(gid):
     crs = cnx.cursor()
-    qry = """select jsonb_pretty(to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Transformer'))"""
-    qry += """from (select *,st_x(g), st_y(g) from livewire.transformerbank where globalid = %s::int ) as foo"""
-    crs.execute(qry,(gid[2:],))
+    # qry = "select (to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Transformer')||"
+    # qry += "jsonb_build_object('cust_info',"
+    # qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from "
+    # qry += "(select *,st_asgeojson(g)::json coords from service.location "
+    # qry += "join service.info using (premises) where connectedtransformer = %(gid)s::text) "
+    # qry += "as foo"
+    # qry += ")))::text " 
+    # qry += "from (select *,st_x(g), st_y(g) from livewire.transformerbank "
+    # qry += "where globalid = %(gid)s::int ) as foo; "
+        
+    
+    
+    qry = "select (to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Transformer')|| "
+    qry += "jsonb_build_object('cust_info', "
+    qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from  "
+    qry += "(select *,st_asgeojson(g)::json coords from service.location  "
+    qry += "join service.info using (premises) where connectedtransformer =  %(gid)s::text)  "
+    qry += "as foo "
+    qry += "))|| "
+    qry += "jsonb_build_object('lamp_info', "
+    qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from  "
+    qry += "(select *,st_asgeojson(g)::json coords from livewire.streetlight  "
+    qry += "where connectedtransformer =  %(gid)s::int)  "
+    qry += "as foo "
+    qry += ")))::text " 
+    qry += "from (select *,st_x(g), st_y(g) from livewire.transformerbank  "
+    qry += "where globalid =  %(gid)s::int ) as foo; "
+  
+    crs.execute(qry,({'gid': gid[2:]}))
+    
+    
+    
+    
     if crs.rowcount == 0:
         qry = """select jsonb_pretty(to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Isolator'))"""
         qry += """from (select *,st_x(g), st_y(g) from livewire.isolators where globalid = %s::int ) as foo"""
+        #print("*********************")
+        #print(crs.mogrify(qry,(gid[2:],)))
+        #print("*********************")
         crs.execute(qry,(gid[2:],))
+        txt = crs.fetchone()
+        
+        print(txt)
+        return txt
     txt = crs.fetchone()
-    print(txt)
+    #print(txt)
     return txt
 
 @route('/customers/<gid>')
 def customers(gid):
     crs = cnx.cursor()
-    qry = "select json_agg(row_to_json(foo.*))::text from "
-    qry += "(select premises, st_asgeojson(g)::json coords  "
-    qry += "from service.location where connectedtransformer = %s) as foo"
+    # qry = "select json_agg(row_to_json(foo.*))::text from "
+    # qry += "(select premises, st_asgeojson(g)::json coords  "
+    # qry += "from service.location where connectedtransformer = %s) as foo"
+    qry = "select json_agg(row_to_json(foo.*)::jsonb -'g')::text from "
+    qry += "(select *,st_asgeojson(g)::json coords from service.location "
+    qry += "join service.info using (premises) where connectedtransformer = %s) "
+    qry += "as foo"
     crs.execute(qry,(gid,))
     return crs.fetchone()
     

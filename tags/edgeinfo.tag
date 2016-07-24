@@ -21,11 +21,15 @@
    #data-body {
     margin-top: 50px; 
    }
-   #showCustomerButton {    text-align: center;}
+   #showCustomerButton {    text-align: center;padding-bottom: 15px}
    p{
      margin:0;
      margin-left:10px;
    }
+   #customerlist {   
+    border-bottom-color: grey;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;}
   </style>
 
   
@@ -53,20 +57,30 @@
       <p if={ mydata.aphasekva > 0 }>Phase A: { mydata.aphasekva } KVA</p>
       <p if={ mydata.bphasekva > 0 }>Phase B: { mydata.bphasekva } KVA</p>
       <p if={ mydata.cphasekva > 0 }>Phase C: { mydata.cphasekva } KVA</p>
+      
       <p>Coordinates: { mydata.st_x }mE, { mydata.st_y } mN</p>      
       <br>
       <div id="showCustomerButton">
         <button id="CustomersButton"  onclick={ showCustomers } class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
-        Display Connected Customers
+        <span if={ shoeCust === 0}>Display Connected Customers</span>
+        <span if={ shoeCust === 1}>Display Summary</span>
         </button>
       </div>
-        <ul if={ shoeCust === 1}>
-          <li each={ items } >
-            <input type="checkbox" checked={ done }> { premises }
-          </li> 
-        </ul>
+      <div  if={ shoeCust === 0}>
+      <p>Customer Count: { mydata.customerCount } </p> 
+      <p>Streetlight Count: { mydata.lampCount } </p> 
+      </div>
+      <div  if={ shoeCust === 1}>
+          <div id="customerlist" each={ items } >
+             { premises } | { service_name }
+             <br>
+             { service_address } <br>
+             Rate: { service_type } <br>
+             
+          </div> 
+      </div>
               
-      
+
     </div>
     <!--Display Isolator Information on Card -->
     <div if={ mydata.isolator === 1 }>
@@ -97,6 +111,9 @@
     if inme.layer is 'Transformer' 
       @mydata.devicetype = 'Transformer'
       @mydata.isolator = 0
+      @mydata.customerCount = inme.cust_info.length if inme.cust_info?
+      @mydata.lampCount = inme.lamp_info.length if inme.lamp_info?
+      
     if inme.layer is 'Isolator' 
       @mydata.isolator = 1
       @mydata.inme
@@ -110,19 +127,15 @@
     zzzz.trigger('clearCustomers')
     riot.update()
       
+  
   @showCustomers = =>
-    url = "customers/#{@mydata.globalid}"
-    console.log url
-    req = new XMLHttpRequest()
-    req.onload = => 
-      @items = JSON.parse(req.responseText)
+    if @shoeCust is 0
+      @items = _.union(@mydata.cust_info,@mydata.lamp_info)
       zzzz.trigger('customersOnMap',@items)
-      riot.update()
-      
-    req.open("GET", url, true)
-    req.send()
-    @shoeCust = 1
-    
+      @shoeCust = 1
+    else
+      @shoeCust = 0
+      zzzz.trigger('clearCustomers')
     
   zzzz.on('infoFeature', (infoFeature)  =>
     @shoeCust = 0
