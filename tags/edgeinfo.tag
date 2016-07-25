@@ -72,11 +72,19 @@
       </div>
       <div  if={ shoeCust === 1}>
           <div id="customerlist" each={ items } >
-             { premises } | { service_name }
+             <section if={ itemType == 'prem' }>
+             { premises } | { service_name } 
              <br>
              { service_address } <br>
              Rate: { service_type } <br>
-             
+             </section>
+             <section if={ itemType == 'lamp' }>
+             Polenumber: { polenumber } 
+             <br>
+             Lamptype: { lamptype } <br>
+             Wattage: { wattage } <br>
+             </section>
+          
           </div> 
       </div>
               
@@ -129,8 +137,13 @@
       
   
   @showCustomers = =>
+    fix = (inob) ->
+      val = if "premises" of inob then 'prem' else 'lamp'
+      inob.itemType = val
+      inob
     if @shoeCust is 0
-      @items = _.union(@mydata.cust_info,@mydata.lamp_info)
+      @items = _.map(_.union(@mydata.cust_info,@mydata.lamp_info),fix)
+      
       zzzz.trigger('customersOnMap',@items)
       @shoeCust = 1
     else
