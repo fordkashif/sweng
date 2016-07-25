@@ -79,14 +79,20 @@
     onEachFeature: (feature, layer) ->
       layer.on({click: -> 
         console.log feature.properties
-        zzzz.trigger('infoFeature', feature.properties)
+        
       })
     pointToLayer: (feat, latlng) ->
       serviceLocation = L.icon({
         iconUrl: 'images/square.png',
         iconSize: [32, 32],
         })
-      return L.marker(latlng,{icon: serviceLocation}) 
+      streetLight = L.icon({
+        iconUrl: 'images/Streetlight.png',
+        iconSize: [32, 32],
+        })
+      return L.marker(latlng,{icon: streetLight}) if feat.properties.gid is 1
+      return L.marker(latlng,{icon: serviceLocation}) if feat.properties.gid is -1
+      
      
   }).addTo(@map)
   
@@ -191,10 +197,6 @@
     zzzz.trigger('zoomStatus',{zoom:@map.getZoom()})
   
   
-     
-    
-  #@map.on('click', (e) -> console.log(e))
-  @map.on('mousemove', (e) ->  zzzz.trigger('coords', xform.forward([e.latlng.lng,e.latlng.lat])))
   @map.on('zoomend moveend', mapmoved)
   
   zzzz.on('mapZoomIn', => @map.zoomIn())
@@ -204,7 +206,7 @@
     h.setLatLng(indata.latlng)
     @map.flyTo(indata.latlng)
     )
-  zzzz.on('featureData')  
+  
   zzzz.on('hideTarget', (indata) -> h.setLatLng([0, 0]))
   zzzz.on('customersOnMap', (indata) ->
     console.log indata
@@ -216,7 +218,8 @@
           "properties": 
             "name": "urn:ogc:def:crs:EPSG::3448"
         "properties": 
-          "gid": inob["premises"].toString()
+          #"gid": inob["premises"].toString() if inob.watta
+          "gid": if "premises" of inob then -1 else 1
         "geometry":inob["coords"]
     
     r = (fix2(m) for m in indata)
