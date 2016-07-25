@@ -68,7 +68,7 @@
   </div>
   
   <div if={ searchitems.length > 0 }>
-  <answer-box class="searchresult" info={ name } each={ name, i in searchitems }></answer-box>
+  <answer-box class="searchresult" info={ name } each={ name, i in searchitems } onclick={ showitem }></answer-box>
   </div>
   
   <div class="noresults" if={ searchbox.value.length > 0 &&  searchitems.length == 0 } >
@@ -108,8 +108,10 @@
         @update()
       
     @showitem = -> 
+      console.log event.item.name.globalid
       zzzz.trigger('hideedgebar')
-      zzzz.trigger('showobject',event.item)
+      #zzzz.trigger('showobject',event.item)
+      zzzz.trigger('infoFeature',{'gid': "22#{event.item.name.globalid}"})
       
     
     

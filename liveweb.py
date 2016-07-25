@@ -39,20 +39,9 @@ def bounds(nwx,nwy,sex,sey,z):
     txt = crs.fetchone()
     return txt
 
-@route('/find/<gid>')
+@route('/find/globalid/<gid>')
 def find(gid):
     crs = cnx.cursor()
-    # qry = "select (to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Transformer')||"
-    # qry += "jsonb_build_object('cust_info',"
-    # qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from "
-    # qry += "(select *,st_asgeojson(g)::json coords from service.location "
-    # qry += "join service.info using (premises) where connectedtransformer = %(gid)s::text) "
-    # qry += "as foo"
-    # qry += ")))::text " 
-    # qry += "from (select *,st_x(g), st_y(g) from livewire.transformerbank "
-    # qry += "where globalid = %(gid)s::int ) as foo; "
-        
-    
     
     qry = "select (to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Transformer')|| "
     qry += "jsonb_build_object('cust_info', "
@@ -70,7 +59,7 @@ def find(gid):
     qry += "from (select *,st_x(g), st_y(g) from livewire.transformerbank  "
     qry += "where globalid =  %(gid)s::int ) as foo; "
   
-    crs.execute(qry,({'gid': gid[2:]}))
+    crs.execute(qry,({'gid': gid}))
     
     
     

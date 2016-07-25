@@ -153,7 +153,7 @@
   zzzz.on('infoFeature', (infoFeature)  =>
     @shoeCust = 0
     console.log infoFeature
-    url = "find/#{infoFeature.gid}"
+    url = "find/global/#{infoFeature.gid}"
     req = new XMLHttpRequest()
     req.onload = -> 
       q = JSON.parse(req.responseText)
@@ -164,12 +164,7 @@
     @update()
   )
   
-  @cordies = ''
-  zzzz.on('coords', (indata) =>
-    #@cordies = (parseInt(ff) for ff in indata.coords)
-    @cordies = (parseInt(ff) for ff in indata)
-    @update()
-  )
+  
         
   @on('mount', -> console.log 'thisinfo')
   </script>
