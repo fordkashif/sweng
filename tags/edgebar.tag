@@ -76,14 +76,7 @@
     
   </div>
   
-  <!-- Checking if searchbox length is greater than five and searches for feedername -->
-  
-  <!--
-  <div if="{ searchbox.value.length > 0 }">
-  
-   <span class="searchresult" each={ searchitems } onclick={ zzzz.showitem }>{ layer }</span>
-  </div>
--->  
+ 
   <script type="coffeescript">
 
     @searchitems = []
@@ -108,10 +101,10 @@
         @update()
       
     @showitem = -> 
-      console.log event.item.name.globalid
+      console.log event.item.name 
       zzzz.trigger('hideedgebar')
       #zzzz.trigger('showobject',event.item)
-      zzzz.trigger('infoFeature',{'gid': "22#{event.item.name.globalid}"})
+      zzzz.trigger('infoFeature',event.item.name)
       
     
     

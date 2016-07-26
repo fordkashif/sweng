@@ -16,8 +16,8 @@
 
   
   <script type="coffeescript">
-  console.log(opts.info)
-  console.log(opts.info.layer)
+  #console.log(opts.info)
+  #console.log(opts.info.layer)
   
   </script>
 </answer-box>
