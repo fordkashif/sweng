@@ -167,10 +167,6 @@
       return L.marker(latlng)
   }).addTo(@map)
   
-  
-  
- 
-  
   mapmoved = =>
     console.log('***')
     if @map.getZoom() > 13
@@ -211,8 +207,13 @@
   zzzz.on('mapZoomOut', => @map.zoomOut())
   zzzz.on('flyTo', (indata) => @map.flyToBounds(L.geoJson(indata.geometry)))
   zzzz.on('showTarget', (indata) => 
-    h.setLatLng(indata.latlng)
-    @map.flyTo(indata.latlng)
+    if 'latlng' of indata
+      h.setLatLng(indata.latlng)
+      @map.flyTo(indata.latlng,18)
+    else
+      coords = xform.inverse(indata)
+      h.setLatLng([coords[1],coords[0]])
+      @map.flyTo([coords[1],coords[0]],18)
     )
   
   zzzz.on('hideTarget', (indata) -> h.setLatLng([0, 0]))

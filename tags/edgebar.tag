@@ -68,7 +68,7 @@
   </div>
   
   <div if={ searchitems.length > 0 }>
-  <answer-box class="searchresult" info={ name } each={ name, i in searchitems }></answer-box>
+  <answer-box class="searchresult" info={ name } each={ name, i in searchitems } onclick={ showitem }></answer-box>
   </div>
   
   <div class="noresults" if={ searchbox.value.length > 0 &&  searchitems.length == 0 } >
@@ -76,14 +76,7 @@
     
   </div>
   
-  <!-- Checking if searchbox length is greater than five and searches for feedername -->
-  
-  <!--
-  <div if="{ searchbox.value.length > 0 }">
-  
-   <span class="searchresult" each={ searchitems } onclick={ zzzz.showitem }>{ layer }</span>
-  </div>
--->  
+ 
   <script type="coffeescript">
 
     @searchitems = []
@@ -108,8 +101,10 @@
         @update()
       
     @showitem = -> 
+      console.log event.item.name 
       zzzz.trigger('hideedgebar')
-      zzzz.trigger('showobject',event.item)
+      #zzzz.trigger('showobject',event.item)
+      zzzz.trigger('infoFeature',event.item.name)
       
     
     
