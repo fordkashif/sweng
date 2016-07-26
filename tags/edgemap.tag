@@ -194,8 +194,8 @@
       
       riot.route.stop()
       riot.route.start(true)
-      riot.route.base('#map')
-      riot.route("/bounds/#{nw[0].toFixed(0)}/#{nw[1].toFixed(0)}/#{se[0].toFixed(0)}/#{se[1].toFixed(0)}/#{@map.getZoom()}");
+      riot.route.base('#')
+      riot.route("/#{nw[0].toFixed(0)}/#{nw[1].toFixed(0)}/#{se[0].toFixed(0)}/#{se[1].toFixed(0)}/#{@map.getZoom()}");
   
   
     else
