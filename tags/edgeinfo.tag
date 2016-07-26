@@ -44,6 +44,7 @@
     </div>
     <!--Create Card to display Transformer and Information -->
     <div id="data-body"></div>
+    
     <!--Display Transformer Information on Card-->
     <div if={ mydata.devicetype === 'Transformer' }>
       <p>Mounted: {mydata.mounted}</p>
@@ -87,8 +88,6 @@
           
           </div> 
       </div>
-              
-
     </div>
     <!--Display Isolator Information on Card -->
     <div if={ mydata.isolator === 1 }>
@@ -96,6 +95,16 @@
       <p>{"Pole Number: " + mydata.polenumber}</p>
       <p>{"Facility ID: " + mydata.facilityid}</p>
       <p>{"Phase Code: " + mydata.phasecode}</p>
+      <p>{"Feeder Name: " + mydata.feedername}</p>
+      <p>{"Description: " + mydata.description}</p>
+      <p>Coordinates: { mydata.st_x }mE, { mydata.st_y } mN</p>  
+    </div>
+    <!--Display service location Information on Card -->
+    <div if={ mydata.devicetype == 'Service Location' }>
+      <p>Premises#: { mydata.premises }</p>
+      <p>Name: { mydata.service_name }</p>
+      <p>Address: { mydata.service_address }</p>
+      <p>Route: { mydata.route }</p>
       <p>{"Feeder Name: " + mydata.feedername}</p>
       <p>{"Description: " + mydata.description}</p>
       <p>Coordinates: { mydata.st_x }mE, { mydata.st_y } mN</p>  
@@ -122,7 +131,11 @@
     if inme.layer is 'Isolator' 
       @mydata.isolator = 1
       @mydata.inme
-    riot.update()
+    if 'premises' of inme
+      @mydata.devicetype = 'Service Location'
+      alert 'll'
+    
+    @.update()
   
   @hideInfo = =>
     @shown = no
@@ -169,8 +182,10 @@
       console.log req.responseText
       updatestuff(q)
       riot.update()
-      zzzz.trigger('showTarget', [q.st_x,q.st_y])
-    
+      zzzz.trigger('showTarget', [q.st_x,q.st_y]) if 'st_x' of q
+      if 'premises' of q
+        console.log 'hhh'
+        zzzz.trigger('showTarget', [ q.coords.coordinates[0], q.coords.coordinates[1]]) 
     req.open("GET", url, true)
     req.send()
     @shown = yes

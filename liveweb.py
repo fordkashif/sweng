@@ -83,7 +83,7 @@ def find_isolator(gid):
 @route('/find/premises/<prem>')
 def find_premises(prem):
     crs = cnx.cursor()
-    qry = "select json_agg(row_to_json(foo.*)::jsonb -'g')::text from "
+    qry = "select (row_to_json(foo.*)::jsonb -'g')::text from "
     qry += "(select *,st_asgeojson(g)::json coords from service.location "
     qry += "left join service.info using (premises) where premises = %s) "
     qry += "as foo"
