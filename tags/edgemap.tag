@@ -191,10 +191,18 @@
       req.open("GET", url, true)
       req.send()
       console.log '----'
+      
+      riot.route.stop()
+      riot.route.start(true)
+      riot.route.base('#map')
+      riot.route("/bounds/#{nw[0].toFixed(0)}/#{nw[1].toFixed(0)}/#{se[0].toFixed(0)}/#{se[1].toFixed(0)}/#{@map.getZoom()}");
+  
+  
     else
       v.clearLayers()
       console.log("no joy at #{@map.getZoom()}")
     zzzz.trigger('zoomStatus',{zoom:@map.getZoom()})
+  
   
   
   @map.on('zoomend moveend', mapmoved)

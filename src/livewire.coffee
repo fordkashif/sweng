@@ -49,7 +49,7 @@ zzzz.on('hideedgebar', ->
     zzzz.searchitems = []
     riot.route('')
     )
-
+    
 @kp = -> alert('boom2')
 
     
@@ -60,9 +60,7 @@ riot.mount('edgeinfo')
 riot.mount('edgebar')
 riot.mount('edgebug')
 riot.mount('edgeghost')
-
-
-
+riot.mount('modaltry')
 
 
 

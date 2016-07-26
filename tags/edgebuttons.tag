@@ -36,7 +36,6 @@
   </button>
   <div style="height:50px"></div>
   
-  
   <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" onclick={ layers }>
     <i class="material-icons">layers</i>  
   </button>
