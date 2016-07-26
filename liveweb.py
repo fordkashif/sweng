@@ -1,5 +1,5 @@
 import glob, os, sys, psycopg2, bottle
-from bottle import route, run, template, response, static_file
+from bottle import route, run, template, response, static_file, redirect
 import json
 
 print('************************')
@@ -113,7 +113,7 @@ def find_premises(prem):
 #     crs.execute(qry,(gid,))
 #     return crs.fetchone()
     
-@route('/search/<num>')
+@route('/search/<num:int>')
 def errbodylook(num):
     crs = cnx.cursor()
     qry = """
@@ -134,13 +134,16 @@ def errbodylook(num):
         from (select * from livewire.pole where polenumber ~* %(bam)s limit 5) as foo)
         select json_agg(payload)::text from one
         """
-    num = '^' + num
+    num = '^' + str(num)
     crs.execute(qry,{'bam':num})
     out = crs.fetchone()[0]
     #print 'len is: ' + str(len(out))
     return out
 
-
+@route('/search/<word>')
+def wordsearch(word):
+    crs = cnx.cursor()
+    
 
 @route('/ele/<zoom>/<x>/<y>')
 def tiles(zoom,x,y):
@@ -152,11 +155,14 @@ def images(image):
     return static_file(image,'www/images/')
 
 
-
-@route('/map')
 @route('/map/')
 def map():
+    redirect("/map")
+
+@route('/map')
+def map():
     return template('www/index.html')
+   
 @route('/livewire.css')
 @route('/map/livewire.css')
 def legend():
