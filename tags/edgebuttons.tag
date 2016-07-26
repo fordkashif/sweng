@@ -5,7 +5,8 @@
       position: fixed;  top: 50%;left: 20px; 
       width: 25px;z-index: 500;
       transform: translatey(-50%);
-      
+          width: 25px;z-index: 500;
+      transform: translatey(-50%);
     }
     :scope.hide {
       left: -450px;
@@ -48,6 +49,7 @@
   <script type="coffeescript">
   
   @search = -> zzzz.trigger('showEdgeBar')
+  @layers = -> zzzz.trigger('showLegend')
   @maxZoom = no
   @minZoom = yes
   @zoomin = -> zzzz.trigger('mapZoomIn')
