@@ -13,11 +13,13 @@
   <div if={ opts.info.layer === 'Isolators' }>
     Isolator: {opts.info.facilityid} | {opts.info.polenumber}
   </div>
-
+  <div if={ opts.info.layer === 'Poles' }>
+    Pole: {opts.info.facilityid} | {opts.info.polenumber}
+  </div>
   
   <script type="coffeescript">
-  console.log(opts.info)
-  console.log(opts.info.layer)
+  #console.log(opts.info)
+  #console.log(opts.info.layer)
   
   </script>
 </answer-box>

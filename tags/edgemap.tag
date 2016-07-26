@@ -167,10 +167,6 @@
       return L.marker(latlng)
   }).addTo(@map)
   
-  
-  
- 
-  
   mapmoved = =>
     console.log('***')
     if @map.getZoom() > 13
@@ -179,7 +175,7 @@
       nw = xform.forward([bounds.getNorthWest().lng,bounds.getNorthWest().lat])
       se = xform.forward([bounds.getSouthEast().lng,bounds.getSouthEast().lat])
       url = "/bounds/#{nw[0].toFixed(0)}/#{nw[1].toFixed(0)}/#{se[0].toFixed(0)}/#{se[1].toFixed(0)}/#{@map.getZoom()}"
-      console.log(url)
+      #console.log(url)
       req = new XMLHttpRequest()
       req.onload = -> 
         #console.log req.responseText
@@ -203,8 +199,13 @@
   zzzz.on('mapZoomOut', => @map.zoomOut())
   zzzz.on('flyTo', (indata) => @map.flyToBounds(L.geoJson(indata.geometry)))
   zzzz.on('showTarget', (indata) => 
-    h.setLatLng(indata.latlng)
-    @map.flyTo(indata.latlng)
+    if 'latlng' of indata
+      h.setLatLng(indata.latlng)
+      @map.flyTo(indata.latlng,18)
+    else
+      coords = xform.inverse(indata)
+      h.setLatLng([coords[1],coords[0]])
+      @map.flyTo([coords[1],coords[0]],18)
     )
   
   zzzz.on('hideTarget', (indata) -> h.setLatLng([0, 0]))
