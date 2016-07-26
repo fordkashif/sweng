@@ -19,7 +19,6 @@ zzzz.base = {
     'trs': L.tileLayer("https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png")
   }
 
-
 zzzz.on('showobject', (indata) ->
     console.log L.version
     zzzz.trigger('flyTo', indata)
@@ -35,6 +34,14 @@ zzzz.on('showEdgeBar', ->
     )
 
 zzzz.hideedgebar = -> zzzz.trigger('hideedgebar')
+zzzz.hideLegend = -> zzzz.trigger('hideLegend')
+
+zzzz.showLegend = -> zzzz.trigger('showLegend')
+zzzz.on('hideLegend', ->
+    document.getElementsByTagName("edgelegend")[0].className = "hide"
+    )
+zzzz.on('showLegend', ->
+    document.getElementsByTagName("edgelegend")[0].className = "disp")
 
 zzzz.on('hideedgebar', ->
     document.getElementsByTagName("edgebar")[0].className = ""
@@ -46,7 +53,7 @@ zzzz.on('hideedgebar', ->
 @kp = -> alert('boom2')
 
     
-    
+riot.mount('edgelegend')    
 riot.mount('edgebuttons')
 riot.mount('edgemap')
 riot.mount('edgeinfo')
