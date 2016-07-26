@@ -201,11 +201,11 @@
   zzzz.on('showTarget', (indata) => 
     if 'latlng' of indata
       h.setLatLng(indata.latlng)
-      @map.flyTo(indata.latlng,16)
+      @map.flyTo(indata.latlng,17)
     else
       coords = xform.inverse(indata)
       h.setLatLng([coords[1],coords[0]])
-      @map.flyTo([coords[1],coords[0]],16)
+      @map.flyTo([coords[1],coords[0]],17)
     )
   
   zzzz.on('hideTarget', (indata) -> h.setLatLng([0, 0]))

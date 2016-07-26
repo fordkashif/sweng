@@ -133,7 +133,7 @@
       @mydata.inme
     if 'premises' of inme
       @mydata.devicetype = 'Service Location'
-      alert 'll'
+      
     
     @.update()
   
