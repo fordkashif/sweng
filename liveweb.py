@@ -65,7 +65,7 @@ def find_transformer(gid):
 @route('/find/streetlight/<gid>')
 def find_streetlight(gid):
     crs = cnx.cursor()
-    qry = """select jsonb_pretty(to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Isolator'))"""
+    qry = """select jsonb_pretty(to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Streetlight'))"""
     qry += """from (select *,st_x(g), st_y(g) from livewire.streetlight where globalid = %s::int ) as foo"""
     crs.execute(qry,(gid,))
     txt = crs.fetchone()
@@ -76,6 +76,15 @@ def find_isolator(gid):
     crs = cnx.cursor()
     qry = """select jsonb_pretty(to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Isolator'))"""
     qry += """from (select *,st_x(g), st_y(g) from livewire.isolators where globalid = %s::int ) as foo"""
+    crs.execute(qry,(gid,))
+    txt = crs.fetchone()
+    return txt
+
+@route('/find/pole/<gid>')
+def find_pole(gid):
+    crs = cnx.cursor()
+    qry = """select jsonb_pretty(to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Pole'))"""
+    qry += """from (select *,st_x(g), st_y(g) from livewire.pole where globalid = %s::int ) as foo"""
     crs.execute(qry,(gid,))
     txt = crs.fetchone()
     return txt

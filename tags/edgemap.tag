@@ -175,7 +175,7 @@
       nw = xform.forward([bounds.getNorthWest().lng,bounds.getNorthWest().lat])
       se = xform.forward([bounds.getSouthEast().lng,bounds.getSouthEast().lat])
       url = "/bounds/#{nw[0].toFixed(0)}/#{nw[1].toFixed(0)}/#{se[0].toFixed(0)}/#{se[1].toFixed(0)}/#{@map.getZoom()}"
-      console.log(url)
+      #console.log(url)
       req = new XMLHttpRequest()
       req.onload = -> 
         #console.log req.responseText
@@ -201,11 +201,11 @@
   zzzz.on('showTarget', (indata) => 
     if 'latlng' of indata
       h.setLatLng(indata.latlng)
-      @map.flyTo(indata.latlng,17)
+      @map.flyTo(indata.latlng,18)
     else
       coords = xform.inverse(indata)
       h.setLatLng([coords[1],coords[0]])
-      @map.flyTo([coords[1],coords[0]],17)
+      @map.flyTo([coords[1],coords[0]],18)
     )
   
   zzzz.on('hideTarget', (indata) -> h.setLatLng([0, 0]))

@@ -59,7 +59,7 @@
       <p if={ mydata.bphasekva > 0 }>Phase B: { mydata.bphasekva } KVA</p>
       <p if={ mydata.cphasekva > 0 }>Phase C: { mydata.cphasekva } KVA</p>
       
-      <p>Coordinates: { mydata.st_x }mE, { mydata.st_y } mN</p>      
+      <p>Coordinates: { mydata.st_x }mE, { mydata.st_y } mN</p>
       <br>
       <div id="showCustomerButton">
         <button id="CustomersButton"  onclick={ showCustomers } class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
@@ -105,9 +105,19 @@
       <p>Name: { mydata.service_name }</p>
       <p>Address: { mydata.service_address }</p>
       <p>Route: { mydata.route }</p>
-      <p>{"Feeder Name: " + mydata.feedername}</p>
-      <p>{"Description: " + mydata.description}</p>
-      <p>Coordinates: { mydata.st_x }mE, { mydata.st_y } mN</p>  
+      
+    </div>
+    <div if={ mydata.devicetype == 'Streetlight' }>
+      <p>Polenumber#: { mydata.polenumber }</p>
+      <p>Lamptype: { mydata.lamptype }</p>
+      <p>Wattage: { mydata.wattage }</p>
+       
+    </div>
+    <div if={ mydata.devicetype == 'Pole' }>
+      <p>Polenumber#: { mydata.polenumber }</p>
+      <p>Construction: { mydata.construction }</p>
+      
+       
     </div>
   </div>
   
@@ -119,23 +129,26 @@
   @mydata = {}
   @custshow = no
   
-  updatestuff = (inme) =>
-    @mydata = {}
-    @mydata = inme
-    console.log(inme)
+  updatestuff = (inme) ->
+    console.log '*** updatestuff ***'
+    console.log(JSON.stringify(inme))
     if inme.layer is 'Transformer' 
-      @mydata.devicetype = 'Transformer'
-      @mydata.isolator = 0
-      @mydata.customerCount = inme.cust_info.length if inme.cust_info?
-      @mydata.lampCount = inme.lamp_info.length if inme.lamp_info?
+      inme.devicetype = 'Transformer'
+      inme.isolator = 0
+      inme.customerCount = inme.cust_info.length if inme.cust_info?
+      inme.lampCount = inme.lamp_info.length if inme.lamp_info?
     if inme.layer is 'Isolator' 
-      @mydata.isolator = 1
-      @mydata.inme
+      inme.isolator = 1
+    if inme.layer is 'Streetlight' 
+      inme.devicetype = 'Streetlight'
+    if inme.layer is 'Pole' 
+      inme.devicetype = 'Pole'
     if 'premises' of inme
-      @mydata.devicetype = 'Service Location'
-      
-    
-    @.update()
+      inme.devicetype = 'Service Location'
+    console.log '-----------------------------------------'
+    console.log inme
+    console.log '*** updatestuff ***'  
+    inme
   
   @hideInfo = =>
     @shown = no
@@ -170,6 +183,8 @@
         url = "/find/isolator/#{infoFeature.globalid}"
       if infoFeature.layer is "Service Location"
         url = "/find/premises/#{infoFeature.premises}"
+      if infoFeature.layer is "Poles"
+        url = "/find/pole/#{infoFeature.globalid}"
     else
       if infoFeature.gid.startsWith('2')
         url = "/find/transformer/#{infoFeature.gid.slice(2)}"
@@ -177,10 +192,10 @@
         url = "/find/isolator/#{infoFeature.gid.slice(2)}"
     req = new XMLHttpRequest()
     console.log "url: #{url}"
-    req.onload = -> 
+    req.onload = => 
       q = JSON.parse(req.responseText)
-      console.log req.responseText
-      updatestuff(q)
+      
+      @mydata = updatestuff(q)
       riot.update()
       zzzz.trigger('showTarget', [q.st_x,q.st_y]) if 'st_x' of q
       if 'premises' of q
