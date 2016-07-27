@@ -181,7 +181,7 @@
         url = "/find/streetlight/#{infoFeature.globalid}"
       if infoFeature.layer is "Isolators"
         url = "/find/isolator/#{infoFeature.globalid}"
-      if infoFeature.layer is "Service Location"
+      if infoFeature.layer in ["Service Location","Service_name"]
         url = "/find/premises/#{infoFeature.premises}"
       if infoFeature.layer is "Poles"
         url = "/find/pole/#{infoFeature.globalid}"

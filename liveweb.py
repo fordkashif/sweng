@@ -143,7 +143,31 @@ def errbodylook(num):
 @route('/search/<word>')
 def wordsearch(word):
     crs = cnx.cursor()
+    qry = "select json_agg(row_to_json(foo.*)::jsonb || "
+    qry += "jsonb_build_object('layer', 'Service_name'))::text from "
+    qry += "(select * from service.info where "
     
+    #qry = """select * from service.info where """
+    q = ['service_name ~* %s' for nn in word.split(' ')]
+    qry =  qry + ' and '.join(q) + ' limit 10) as foo'
+    print crs.mogrify(qry,word.split(' '))
+    crs.execute(qry,word.split(' '))
+    return crs.fetchone()[0]
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @route('/ele/<zoom>/<x>/<y>')
 def tiles(zoom,x,y):

@@ -37,7 +37,7 @@
   L.Icon.Default.imagePath = '/images'
   
   base = {
-    'osm': L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{opacity: .25, maxZoom: 19})
+    'osm': L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{opacity: .85, maxZoom: 19})
     'out': L.tileLayer("https://{s}.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png")
     'cdb': L.tileLayer("http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png")
     }
@@ -199,13 +199,15 @@
   zzzz.on('mapZoomOut', => @map.zoomOut())
   zzzz.on('flyTo', (indata) => @map.flyToBounds(L.geoJson(indata.geometry)))
   zzzz.on('showTarget', (indata) => 
+    zoom = if @map.getZoom() < 17 then 17 else  @map.getZoom()
+    
     if 'latlng' of indata
       h.setLatLng(indata.latlng)
-      @map.flyTo(indata.latlng,18)
+      @map.flyTo(indata.latlng,zoom)
     else
       coords = xform.inverse(indata)
       h.setLatLng([coords[1],coords[0]])
-      @map.flyTo([coords[1],coords[0]],18)
+      @map.flyTo([coords[1],coords[0]],zoom)
     )
   
   zzzz.on('hideTarget', (indata) -> h.setLatLng([0, 0]))
