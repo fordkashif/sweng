@@ -33,6 +33,12 @@ zzzz.on('showEdgeBar', ->
     console.log('meet')
     )
 
+zzzz.bringit_pushitback = -> zzzz.trigger('bringit_pushitback')
+zzzz.on('bringit_pushitback', -> 
+    document.getElementByTagName('edgelegend').toggleClass('disp')
+    )
+
+
 zzzz.hideedgebar = -> zzzz.trigger('hideedgebar')
 zzzz.hideLegend = -> zzzz.trigger('hideLegend')
 
@@ -41,7 +47,8 @@ zzzz.on('hideLegend', ->
     document.getElementsByTagName("edgelegend")[0].className = "hide"
     )
 zzzz.on('showLegend', ->
-    document.getElementsByTagName("edgelegend")[0].className = "disp")
+    document.getElementsByTagName("edgelegend")[0].className = "disp"
+    )
 
 zzzz.on('hideedgebar', ->
     document.getElementsByTagName("edgebar")[0].className = ""

@@ -1,7 +1,7 @@
 <edgelegend>
   <style scoped>
       :scope { 
-        transition: left 1.25s ease-out .25s; 
+        transition: left .25s ease-out .25s; 
         position: fixed;  
         top: 50%;
         left: 100px; 
@@ -36,7 +36,17 @@
           margin-left: 60%;
           height: 200px;
       }
-
+      
+      #primaryshape{
+        width:32px;
+        height:5px;
+        background:#80115f;
+      }
+      #secondaryshape{
+        width:32px;
+        height:1px;
+        background:blue;
+      }
      
       
   </style>
@@ -92,6 +102,14 @@
               <td class="mdl-data-table__cell--non-numeric" id="transpad">Transformer Pad</td>
               <td><img src="images/TransformerPad.png"></td>
             </tr>
+            <tr>
+              <td class="mdl-data-table__cell--non-numeric" id="transpad">Primary Lines</td>
+              <td><div id="primaryshape"></div></td>
+            </tr>
+            <tr>
+              <td class="mdl-data-table__cell--non-numeric" id="transpad">Secondary Lines</td>
+              <td><div id="secondaryshape"></div></td>
+            </tr>
           </tbody>
         </table>  
       
@@ -114,6 +132,7 @@
 
 <script type="coffeescript">
   zzzz.hideLegend = -> zzzz.trigger("hideLegend")
+  
   #zzzz
 </script>
 
