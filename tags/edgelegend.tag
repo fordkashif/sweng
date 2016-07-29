@@ -49,7 +49,7 @@
       }
       #primaryshape3{
         border: 0 none;
-        border-top: 2px dashed #80115f;
+        border-top: 1px dashed #80115f;
         background: none;
         height:0;
       }
