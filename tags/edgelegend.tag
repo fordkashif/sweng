@@ -11,7 +11,7 @@
       }
       :scope.hide {
         left: -500px;
-        transition: left 1.25s ease-out;
+        transition: left .25s ease-out;
         
       }
       #zoomholder {
@@ -52,44 +52,44 @@
         <br>
         <div>
         
-        <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable">
+        <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable" id="legend">
           <thead>
             <tr>
-              <th class="mdl-data-table__cell--non-numeric">Element</th>
+              <th class="mdl-data-table__cell--non-numeric" id="all-elements">Element</th>
               <th>Icon</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td class="mdl-data-table__cell--non-numeric">Customers</td>
+              <td class="mdl-data-table__cell--non-numeric" id="customers">Customers</td>
               <td><img src="images/square.png"></td>
             </tr>
             <tr>
-              <td class="mdl-data-table__cell--non-numeric">Transformers</td>
+              <td class="mdl-data-table__cell--non-numeric" id="transformers">Transformers</td>
               <td><img src="images/Transformer.png"></td>
             </tr>
             <tr>
-              <td class="mdl-data-table__cell--non-numeric">Streetlight</td>
+              <td class="mdl-data-table__cell--non-numeric" id="lights">Streetlight</td>
               <td><img src="images/Streetlight.png"></td>
             </tr>
             <tr>
-              <td class="mdl-data-table__cell--non-numeric">Substation</td>
+              <td class="mdl-data-table__cell--non-numeric" id="subs">Substation</td>
               <td><img src="images/Substation.png"></td>
             </tr>
             <tr>
-              <td class="mdl-data-table__cell--non-numeric">Isolator Field Operated Close</td>
+              <td class="mdl-data-table__cell--non-numeric" id="iso-closed">Isolator Field Operated Close</td>
               <td><img src="images/Isolator_Field_Operated_Closed.png"></td>
             </tr>
             <tr>
-              <td class="mdl-data-table__cell--non-numeric">Isolator Field Operated Open</td>
+              <td class="mdl-data-table__cell--non-numeric" id="iso-opened">Isolator Field Operated Open</td>
               <td><img src="images/Isolator_Field_Operated_Open.png"></td>
             </tr>
             <tr>
-              <td class="mdl-data-table__cell--non-numeric">Open Switch</td>
+              <td class="mdl-data-table__cell--non-numeric" id="switch-open">Open Switch</td>
               <td><img src="images/Open Switch.png"></td>
             </tr>
             <tr>
-              <td class="mdl-data-table__cell--non-numeric">Transformer Pad</td>
+              <td class="mdl-data-table__cell--non-numeric" id="transpad">Transformer Pad</td>
               <td><img src="images/TransformerPad.png"></td>
             </tr>
           </tbody>
