@@ -5,21 +5,21 @@
         position: fixed;  
         top: 50%;
         left: 100px; 
-        width: 200px;
+        display: inline-block;
         z-index: 500;
         transform: translatey(-50%);
       }
       :scope.hide {
-        left: -450px;
+        left: -500px;
         transition: left 1.25s ease-out;
         
       }
       #zoomholder {
         opacity: 1; 
-        background-color: rgba(251,251,251,.85);
-        padding: 5px;
-        padding-bottom: 25px;
-        border-radius: 10px;
+        background-color: rgba(251,251,251,.99);
+        padding: 0px;
+        padding-bottom: 0px;
+        border-radius: 5px;
       }
       #zoomholder.show {
         
