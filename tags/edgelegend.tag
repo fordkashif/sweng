@@ -42,6 +42,17 @@
         height:5px;
         background:#80115f;
       }
+      #primaryshape2{
+        width:32px;
+        height:2px;
+        background:#80115f;
+      }
+      #primaryshape3{
+        border: 0 none;
+        border-top: 2px dashed #80115f;
+        background: none;
+        height:0;
+      }
       #secondaryshape{
         width:32px;
         height:1px;
@@ -103,8 +114,16 @@
               <td><img src="images/TransformerPad.png"></td>
             </tr>
             <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="transpad">Primary Lines</td>
+              <td class="mdl-data-table__cell--non-numeric" id="transpad">3 Phase Lines</td>
               <td><div id="primaryshape"></div></td>
+            </tr>
+            <tr>
+              <td class="mdl-data-table__cell--non-numeric" id="transpad">2 Phase Lines</td>
+              <td><div id="primaryshape2"></div></td>
+            </tr>
+            <tr>
+              <td class="mdl-data-table__cell--non-numeric" id="transpad">1 Phase Line</td>
+              <td><hr id="primaryshape3"></hr></td>
             </tr>
             <tr>
               <td class="mdl-data-table__cell--non-numeric" id="transpad">Secondary Lines</td>
