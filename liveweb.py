@@ -288,7 +288,7 @@ def images(image):
 
 
 @route('/map/')
-def map():
+def map_():
     redirect("/map")
 
 @route('/map')
