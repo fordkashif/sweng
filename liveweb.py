@@ -24,6 +24,20 @@ def index():
 def bounds2(toggles,nwx,nwy,sex,sey,z):
     #/bounds/758007/654406/775445/648123/14
     crs = cnx.cursor()
+    # toggles
+    # A - Primaryline 3-Phase
+    # B - Primaryline 2-Phase
+    # C - Primaryline Single Phase
+    # D - Secondaryline
+    # E - Pole Mounted transformers
+    # F - Pad Mounted transformers
+    # G - Isolator Fuse
+    # H - Isolator - Remotely Operated - Closed
+    # I - Isolator - Remotely Operated - Open
+    # J - Isolator - Field Operated - Closed
+    # K - Isolator - Field Operated - Open
+    
+    
     
     q_primary = """
     select  jsonb_build_object(
@@ -38,7 +52,9 @@ def bounds2(toggles,nwx,nwy,sex,sey,z):
       || st_asgeojson(g,0)::jsonb payload from livewire.primaryline 
     where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5)
     """
-    
+    if 'ABC' in toggles:
+        pass    
+        
     q_secondary = """
     select jsonb_build_object(
       'GID',
@@ -107,7 +123,7 @@ def bounds2(toggles,nwx,nwy,sex,sey,z):
         qrys.append(q_secondary)
     if 'C' in toggles and z > 17:
         qrys.append(q_poles)
-    if 'D in toggles' and z > 19:
+    if 'D in toggles' and z > 1:
         qrys.append(q_isolators)
     if 'E in toggles' and z > 17:
         qrys.append(q_transformers)
