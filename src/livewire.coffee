@@ -47,9 +47,6 @@ zzzz.on('hideedgebar', ->
     
     )
 
-@kp = -> alert('boom2')
-
-    
 riot.mount('edgelegend')    
 riot.mount('edgebuttons')
 riot.mount('edgemap')

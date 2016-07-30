@@ -12,32 +12,139 @@ cnx = psycopg2.connect('dbname=livewire user=rhys password=mikoy@nshamar!3 host=
 def index():
     return '<h1 style="font-size: 40em; text-align:center">@</h1>'
 
-@route('/bounds/<nwx:int>/<nwy:int>/<sex:int>/<sey:int>/<z:int>')
-def bounds(nwx,nwy,sex,sey,z):
+# @route('/bounds/<nwx:int>/<nwy:int>/<sex:int>/<sey:int>/<z:int>')
+# def bounds(nwx,nwy,sex,sey,z):
+#     #/bounds/758007/654406/775445/648123/14
+#     crs = cnx.cursor()
+#     crs.callproc('web.get_payload_live',[nwx,nwy,sex,sey])
+#     txt = crs.fetchone()
+#     return txt
+    
+@route('/bounds/<toggles>/<nwx:int>/<nwy:int>/<sex:int>/<sey:int>/<z:int>')
+def bounds2(toggles,nwx,nwy,sex,sey,z):
     #/bounds/758007/654406/775445/648123/14
     crs = cnx.cursor()
-    crs.callproc('web.get_payload_live',[nwx,nwy,sex,sey])
-    txt = crs.fetchone()
-    return txt
+    
+    q_primary = """
+    select  jsonb_build_object(
+      'GID',
+      CASE 
+       when phasecode = 'ABC' 
+       then ('33'||globalid::text)::int /* Three Phase line*/
+       when phasecode in ('AB','AC','BC') 
+       then ('32'||globalid::text)::int /* Two Phase line*/
+       ELSE ('31'||globalid::text)::int /* Single Phase line*/
+      end)
+      || st_asgeojson(g,0)::jsonb payload from livewire.primaryline 
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5)
+    """
+    
+    q_secondary = """
+    select jsonb_build_object(
+      'GID',
+      ('39'||globalid::text)::int) 
+      || st_asgeojson(g,0)::jsonb payload from livewire.secondaryline 
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5)
+    """
+    
+    q_poles = """
+    select jsonb_build_object(
+      'GID',
+      ('88'||globalid::text)::int) 
+      || st_asgeojson(g,0)::jsonb payload from livewire.pole 
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5) 
+    """
+    
+    q_transformers = """
+    select jsonb_build_object(
+      'GID',
+      case 
+        when mounted = 'POLE' then ('22'||globalid::text)::int 
+        ELSE ('21'||globalid::text)::int
+      end)
+      || st_asgeojson(g,0)::jsonb payload from livewire.transformerbank
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5) 
+    """
+    
+    q_isolators = """ 
+    select jsonb_build_object(
+      'GID',
+      case 
+        when devicetype = 'FUSE' and status = 'CLOSED' 
+        then ('99'||globalid::text)::int 
+        when devicetype in ('LAB','KS') and status = 'CLOSED' 
+        then ('98'||globalid::text)::int 
+        when devicetype in ('LAB','KS','FUSE') and status = 'OPEN' 
+        then ('97'||globalid::text)::int 
+        when devicetype in ('ALBS', 'PMR','LCB','LBS') and "status" = 'OPEN' 
+        then ('96'||globalid::text)::int 
+        when devicetype in ('ALBS', 'PMR','LCB','LBS') and "status" = 'CLOSED' 
+        then ('95'||globalid::text)::int 
+        when devicetype = 'FDR' then ('94'||globalid::text)::int 
+        ELSE ('93'||globalid::text)::int 
+      end) 
+      || st_asgeojson(g,0)::jsonb payload from livewire.isolators 
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5)
+    """
+    # q_isolators_filter = ""
+    # if 'A' in toggles:
+    #   q_isolators_filter += "devicetype = 'FUSE' and status = 'CLOSED'" 
+    
+    q_streetlamps = """
+    select jsonb_build_object(
+      'GID',
+      ('44'||globalid::text)::int)
+      || st_asgeojson(g,0)::jsonb payload from livewire.streetlight 
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5)
+    """
+    
+    
+    qry = "select json_agg(payload)::text from ( "
+    qrys = []
+    if 'A' in toggles:
+        qrys.append( q_primary)
+    if 'B' in toggles and z > 17:
+        qrys.append(q_secondary)
+    if 'C' in toggles and z > 17:
+        qrys.append(q_poles)
+    if 'D in toggles' and z > 19:
+        qrys.append(q_isolators)
+    if 'E in toggles' and z > 17:
+        qrys.append(q_transformers)
+    if 'F in toggles' and z > 17:
+        qrys.append(q_streetlamps)
+        
+    qry += ' UNION ALL '.join(qrys)
+    qry += ") as foo"
+    #print qry
+    print crs.mogrify(qry,{'nwx':nwx,'nwy':nwy,'sex':sex,'sey':sey})
+    crs.execute(qry,{'nwx':nwx,'nwy':nwy,'sex':sex,'sey':sey})
+    return crs.fetchone()
+
+    
+    
+    
+    
+    
 
 @route('/find/transformer/<gid>')
 def find_transformer(gid):
     crs = cnx.cursor()
-    qry = "select (to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Transformer')|| "
-    qry += "jsonb_build_object('cust_info', "
-    qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from  "
-    qry += "(select *,st_asgeojson(g)::json coords from service.location  "
-    qry += "join service.info using (premises) where connectedtransformer =  %(gid)s::text)  "
-    qry += "as foo "
-    qry += "))|| "
-    qry += "jsonb_build_object('lamp_info', "
-    qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from  "
-    qry += "(select *,st_asgeojson(g)::json coords from livewire.streetlight  "
-    qry += "where connectedtransformer =  %(gid)s::int)  "
-    qry += "as foo "
-    qry += ")))::text " 
-    qry += "from (select *,st_x(g), st_y(g) from livewire.transformerbank  "
-    qry += "where globalid =  %(gid)s::int ) as foo; "
+    # qry = "select (to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Transformer')|| "
+    # qry += "jsonb_build_object('cust_info', "
+    # qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from  "
+    # qry += "(select *,st_asgeojson(g)::json coords from service.location  "
+    # qry += "join service.info using (premises) where connectedtransformer =  %(gid)s::text)  "
+    # qry += "as foo "
+    # qry += "))|| "
+    # qry += "jsonb_build_object('lamp_info', "
+    # qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from  "
+    # qry += "(select *,st_asgeojson(g)::json coords from livewire.streetlight  "
+    # qry += "where connectedtransformer =  %(gid)s::int)  "
+    # qry += "as foo "
+    # qry += ")))::text " 
+    # qry += "from (select *,st_x(g), st_y(g) from livewire.transformerbank  "
+    # qry += "where globalid =  %(gid)s::int ) as foo; "
     qry = """select (
               to_jsonb(foo.*) - 'g' 
               || jsonb_build_object('layer','Transformer')
@@ -89,6 +196,7 @@ def find_pole(gid):
     txt = crs.fetchone()
     return txt
 
+
 @route('/find/premises/<prem>')
 def find_premises(prem):
     crs = cnx.cursor()
@@ -113,7 +221,7 @@ def find_premises(prem):
 #     crs.execute(qry,(gid,))
 #     return crs.fetchone()
     
-@route('/search/<num:int>')
+@route('/search/<num:re:[0-9]+>')
 def errbodylook(num):
     crs = cnx.cursor()
     qry = """

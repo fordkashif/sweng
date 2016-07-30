@@ -83,7 +83,7 @@
       })
     pointToLayer: (feat, latlng) ->
       serviceLocation = L.icon({
-        iconUrl: 'images/square.png',
+        iconUrl: 'images/ServiceLocation.png',
         iconSize: [32, 32],
         })
       streetLight = L.icon({
@@ -106,6 +106,8 @@
         return {"color": "#80115f","weight": 2,"opacity": 1,"dashArray":"5, 2"}
       if feat.properties.gid.startsWith('31') 
         return {"color": "#80115f","weight": 1,"opacity": 1,"dashArray":"2, 2" }
+      if feat.properties.gid.startsWith('39') 
+        return {"color": "blue","weight": .5,"opacity": 1,"dashArray":"2, 1" }
     onEachFeature: (feature, layer) ->
       layer.on({click: (e) -> 
         console.log feature.properties
@@ -116,6 +118,14 @@
         zzzz.trigger('clearCustomers')
       })
     pointToLayer: (feat, latlng) ->
+      pole = L.icon({
+        iconUrl: 'images/Pole.png',
+        iconSize: [32, 32],
+        })
+      streetLight = L.icon({
+        iconUrl: 'images/Streetlight.png',
+        iconSize: [32, 32],
+        })
       isolator_FC = L.icon({
         iconUrl: 'images/Isolator_Field_Operated_Closed.png',
         iconSize: [32, 32],
@@ -149,9 +159,9 @@
         iconSize: [32, 32],
         })
       if feat.properties.gid.startsWith('22') 
-        return L.marker(latlng,{icon: transformer}) 
+        return L.marker(latlng,{icon: transformer, zIndexOffset: 99}) 
       if feat.properties.gid.startsWith('21') 
-        return L.marker(latlng,{icon: transformerpad}) 
+        return L.marker(latlng,{icon: transformerpad, zIndexOffset: 99}) 
       if feat.properties.gid.startsWith('94') 
         return L.marker(latlng,{icon: substation})
       if feat.properties.gid.startsWith('99') 
@@ -164,6 +174,10 @@
         return L.marker(latlng,{icon: isolator_RO})
       if feat.properties.gid.startsWith('95') 
         return L.marker(latlng,{icon: isolator_RC})
+      if feat.properties.gid.startsWith('88') 
+        return L.marker(latlng,{icon: pole, zIndexOffset: -99})
+      if feat.properties.gid.startsWith('44') 
+        return L.marker(latlng,{icon: streetLight, zIndexOffset: 10})
       return L.marker(latlng)
   }).addTo(@map)
   
@@ -174,7 +188,7 @@
       console.log bounds
       nw = xform.forward([bounds.getNorthWest().lng,bounds.getNorthWest().lat])
       se = xform.forward([bounds.getSouthEast().lng,bounds.getSouthEast().lat])
-      url = "/bounds/#{nw[0].toFixed(0)}/#{nw[1].toFixed(0)}/#{se[0].toFixed(0)}/#{se[1].toFixed(0)}/#{@map.getZoom()}"
+      url = "/bounds/ABCDEFGH/#{nw[0].toFixed(0)}/#{nw[1].toFixed(0)}/#{se[0].toFixed(0)}/#{se[1].toFixed(0)}/#{@map.getZoom()}"
       #console.log(url)
       req = new XMLHttpRequest()
       req.onload = -> 
@@ -193,7 +207,7 @@
     zzzz.trigger('zoomStatus',{zoom:@map.getZoom()})
   
   
-  @map.on('zoomend moveend', mapmoved)
+  @map.on('moveend', mapmoved)
   
   zzzz.on('mapZoomIn', => @map.zoomIn())
   zzzz.on('mapZoomOut', => @map.zoomOut())

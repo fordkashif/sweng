@@ -15,5 +15,10 @@ getProj4Leaflet:
 	wget https://raw.githubusercontent.com/kartena/Proj4Leaflet/leaflet-proj-refactor/src/proj4leaflet.js 
 	mv proj4leaflet.js make_modules/proj4leaflet/proj4leaflet.js
 
+getLeafletHeat:
+	mkdir make_modules/leafletHeat
+	wget https://raw.githubusercontent.com/Leaflet/Leaflet.heat/gh-pages/src/HeatLayer.js 
+	mv HeatLayer.js  make_modules/leafletHeat
+
 npmPull:
 	npm install
