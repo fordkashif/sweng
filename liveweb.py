@@ -25,19 +25,20 @@ def bounds2(toggles,nwx,nwy,sex,sey,z):
     #/bounds/758007/654406/775445/648123/14
     crs = cnx.cursor()
     # toggles
-    # A - Primaryline 3-Phase
-    # B - Primaryline 2-Phase
-    # C - Primaryline Single Phase
-    # D - Secondaryline
-    # E - Pole Mounted transformers
-    # F - Pad Mounted transformers
-    # G - Isolator Fuse
-    # H - Isolator - Remotely Operated - Closed
-    # I - Isolator - Remotely Operated - Open
-    # J - Isolator - Field Operated - Closed
-    # K - Isolator - Field Operated - Open
-    
-    
+    # A - Primaryline 
+    # B - Secondaryline
+    # C - Pad Mounted transformers
+    # D - Pole Mounted transformers
+    # E - Interphase transformers
+    # F - Isolator - Remotely Operated - Closed
+    # G - Isolator - Remotely Operated - Open
+    # H - Isolator - Field Operated - Closed
+    # I - Isolator - Field Operated - Open
+    # J - Isolator Fuse
+    # K - Feeder Recloser
+    # L - Streetlamps
+    # M - Poles
+   
     
     q_primary = """
     select  jsonb_build_object(
@@ -52,9 +53,7 @@ def bounds2(toggles,nwx,nwy,sex,sey,z):
       || st_asgeojson(g,0)::jsonb payload from livewire.primaryline 
     where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5)
     """
-    if 'ABC' in toggles:
-        pass    
-        
+    
     q_secondary = """
     select jsonb_build_object(
       'GID',
@@ -70,7 +69,11 @@ def bounds2(toggles,nwx,nwy,sex,sey,z):
       || st_asgeojson(g,0)::jsonb payload from livewire.pole 
     where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5) 
     """
-    
+    q_interphase = """
+    select jsonb_build_object(
+      'GID', ('23'||globalid::text)::int) 
+      || st_asgeojson(g,0)::jsonb payload from livewire.interphase_transformers  
+    """
     q_transformers = """
     select jsonb_build_object(
       'GID',
@@ -81,7 +84,14 @@ def bounds2(toggles,nwx,nwy,sex,sey,z):
       || st_asgeojson(g,0)::jsonb payload from livewire.transformerbank
     where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5) 
     """
-    
+    q_transformers_filter = []
+    if 'CD' not in toggles:
+        if 'C' in toggles:
+            q_isolators_filter.append("mounted = 'POLE")
+        if 'D' in toggles:
+            q_isolators_filter.append("mounted = 'PAD")
+        q_transformers += ' AND ('+' OR '.join(q_transformers_filter) + ')'    
+            
     q_isolators = """ 
     select jsonb_build_object(
       'GID',
@@ -102,9 +112,21 @@ def bounds2(toggles,nwx,nwy,sex,sey,z):
       || st_asgeojson(g,0)::jsonb payload from livewire.isolators 
     where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5)
     """
-    # q_isolators_filter = ""
-    # if 'A' in toggles:
-    #   q_isolators_filter += "devicetype = 'FUSE' and status = 'CLOSED'" 
+    q_isolators_filter = []
+    if 'FGHIJK' not in toggles:
+        if 'F' in toggles:
+            q_isolators_filter.append("devicetype in ('ALBS', 'PMR','LCB','LBS') and status = 'CLOSED'" )
+        if 'G' in toggles:
+            q_isolators_filter.append("devicetype in ('ALBS', 'PMR','LCB','LBS') and status = 'OPEN'" )
+        if 'H' in toggles:
+            q_isolators_filter.append("devicetype in ('LAB','KS') and status = 'CLOSED'" ) 
+        if 'I' in toggles:
+            q_isolators_filter.append("devicetype in ('LAB','KS','FUSE') and status = 'OPEN'")
+        if 'J' in toggles:
+            q_isolators_filter.append(" devicetype = 'FUSE' and status = 'CLOSED'")
+        if 'K' in toggles:
+            q_isolators_filter.append(" devicetype = 'FDR' and status = 'CLOSED'")
+        q_isolators += ' AND ('+' OR '.join(q_isolators_filter) + ')'
     
     q_streetlamps = """
     select jsonb_build_object(
@@ -121,14 +143,17 @@ def bounds2(toggles,nwx,nwy,sex,sey,z):
         qrys.append( q_primary)
     if 'B' in toggles and z > 17:
         qrys.append(q_secondary)
-    if 'C' in toggles and z > 17:
-        qrys.append(q_poles)
-    if 'D in toggles' and z > 1:
-        qrys.append(q_isolators)
-    if 'E in toggles' and z > 17:
+    if ('C' in toggles or 'D' in toggles) and z > 16:
         qrys.append(q_transformers)
-    if 'F in toggles' and z > 17:
+    if 'E' in toggles:
+        qrys.append(q_interphase)
+    if (('F' in toggles or 'G' in toggles or 'H' in toggles or 'I' in toggles or 'J' in toggles or 'K' in toggles) and z > 14) or  ('K' in toggles and z > 11) :
+        qrys.append(q_isolators)
+    if 'L' in toggles and z > 17:
         qrys.append(q_streetlamps)
+    if 'M' in toggles and z > 17:
+        qrys.append(q_poles)
+    
         
     qry += ' UNION ALL '.join(qrys)
     qry += ") as foo"

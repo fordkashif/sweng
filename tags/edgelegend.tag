@@ -21,6 +21,7 @@
         padding-bottom: 0px;
         border-radius: 5px;
       }
+      
       #zoomholder.show {
         
         opacity: 1;
@@ -58,13 +59,14 @@
         height:1px;
         background:blue;
       }
-     
+     img {filter: grayscale(0);}
+     .noshow{filter: grayscale(1);}
       
   </style>
     <div class="modal">
       <div id="zoomholder"  >
         <div id="legend-header">
-          <span style="float: left"><h5 style="margin:10px">Legend</h5></span>
+          <span style="float: left"><h5 style="margin:10px">Layers</h5></span>
           <span style="float: right;">
           <button class="mdl-button mdl-js-button mdl-button--icon" onclick={ zzzz.hideLegend }>
             <i class="material-icons">close</i>
@@ -73,76 +75,38 @@
         <br>
         <div>
         
-        <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable" id="legend">
-          <thead>
-            <tr>
-              <th class="mdl-data-table__cell--non-numeric" id="all-elements">Element</th>
-              <th>Icon</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="customers">Customers</td>
-              <td><img src="images/square.png"></td>
-            </tr>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="transformers">Transformers</td>
-              <td><img src="images/Transformer.png"></td>
-            </tr>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="lights">Streetlight</td>
-              <td><img src="images/Streetlight.png"></td>
-            </tr>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="subs">Substation</td>
-              <td><img src="images/Substation.png"></td>
-            </tr>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="iso-closed">Isolator Field Operated Close</td>
-              <td><img src="images/Isolator_Field_Operated_Closed.png"></td>
-            </tr>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="iso-opened">Isolator Field Operated Open</td>
-              <td><img src="images/Isolator_Field_Operated_Open.png"></td>
-            </tr>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="switch-open">Open Switch</td>
-              <td><img src="images/Open Switch.png"></td>
-            </tr>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="transpad">Transformer Pad</td>
-              <td><img src="images/TransformerPad.png"></td>
-            </tr>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="transpad">3 Phase Lines</td>
-              <td><div id="primaryshape"></div></td>
-            </tr>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="transpad">2 Phase Lines</td>
-              <td><div id="primaryshape2"></div></td>
-            </tr>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="transpad">1 Phase Line</td>
-              <td><hr id="primaryshape3"></hr></td>
-            </tr>
-            <tr>
-              <td class="mdl-data-table__cell--non-numeric" id="transpad">Secondary Lines</td>
-              <td><div id="secondaryshape"></div></td>
-            </tr>
-          </tbody>
-        </table>  
+  <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable" id="legend">
+   <tr each={name, i in zzzz.legend_items } >
+      <td>
+        <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="switch-{ i }">
+        <input type="checkbox" id="switch-{i}" class="mdl-switch__input" onclick={ layerselect  } checked={ name.show }>
+        <span class="mdl-switch__label">{ name.title }</span>
+        
+        </label>
+      </td>
+      <td>
+        <img if={ name.imgurl } src={ name.imgurl } class={ noshow: name.show }>
+        <div if={ name.divclas } id="{ name.divclas }"></div>
+      </td>
+   </tr>
+   </tbody>
+  </table>
+  
+</material-checkbox>
       
-            
+  <!--<ul class="mdl-list">-->
+  <!--  <li each={ name, i in zzzz.legend_items } class="mdl-list__item" onclick={ layerselect  }>-->
+  <!--    <span class="mdl-list__item-primary-content">-->
+  <!--    <img if={ name.imgurl } src={ name.imgurl } class={ noshow: name.noshow }>-->
+  <!--    <div if={ name.divclas } id="{ name.divclas }"></div>-->
+  <!--    </span>    -->
+  <!--    { name.title } -->
+  
+  <!--  </li>-->
+    
+  <!--</ul>-->
       
-        <!--    <div><img src="images/square.png">Customers</div> -->
-         <!--   <div><img src="images/Transformer.png">Transformer</div>
-            <div><img src="images/Streetlight.png">Streetlight</div>
-            <div><img src="images/Substation.png">Substation</div> -->
-            
-       <!--     <div><img src="images/Isolator_Field_Operated_Closed.png">Isolator Field Operated Closed  </div>
-            <div><img src="images/Isolator_Field_Operated_Open.png">Isolator Field Operated Closed</div>
-            <div><img src="images/Open Switch.png">Open Switch</div> 
-            <div><img src="images/TransformerPad.png">Transformer Pad</div> -->
+   
           
         </div>
       </div>
@@ -152,7 +116,30 @@
 <script type="coffeescript">
   zzzz.hideLegend = -> zzzz.trigger("hideLegend")
   
-  #zzzz
+  zzzz.legend_items = [
+    {alpha: 'A',maxZoom: 14, show: yes, title: 'Primary Lines', divclas: "primaryshape" }
+    {alpha: 'B',maxZoom: 14, show: yes, title: 'Secondary Lines', divclas: "secondaryshape" }
+    {alpha: 'C',maxZoom: 14, show: yes, title: 'Transformers (Pole Mounted)', imgurl: "images/Transformer.png" }
+    {alpha: 'D',maxZoom: 14, show: yes, title: 'Transformers (Pad Mounted)', imgurl: "images/TransformerPad.png" }
+    {alpha: 'E',maxZoom: 14, show: yes, title: 'Interphase Transformers', imgurl: "images/Interphase_Transformer.png" }
+    {alpha: 'F',maxZoom: 14, show: yes, title: 'Remotely Operated Switch - Closed', imgurl: "images/Isolator_Remotely_Operated_Closed.png" }
+    {alpha: 'G',maxZoom: 14, show: yes, title: 'Remotely Operated Switch - Open', imgurl: "images/Isolator_Remotely_Operated_Open.png" }
+    {alpha: 'H',maxZoom: 14, show: yes, title: 'Field Operated Switch - Closed', imgurl: "images/Isolator_Field_Operated_Closed.png" }
+    {alpha: 'I',maxZoom: 14, show: yes, title: 'Field Operated Switch - Open', imgurl: "images/Isolator_Field_Operated_Open.png" }
+    {alpha: 'J',maxZoom: 14, show: yes, title: 'Fuses', imgurl: "images/Isolator_Fuse.png" }
+    {alpha: 'K',maxZoom: 14, show: yes, title: 'Feeder Recloser', imgurl: "images/Substation.png" }
+    {alpha: 'L',maxZoom: 14, show: yes, title: 'Streetlights', imgurl: "images/Streetlight.png" }
+    {alpha: 'M',maxZoom: 14, show: yes, title: 'Poles', imgurl: "images/Pole.png" }
+    ]
+  @layerselect = (e) =>
+   console.log e.item
+   #e.preventDefault()
+   zzzz.legend_items[e.item.i].show = not zzzz.legend_items[e.item.i].show
+   #riot.update()
+   #console.log zzzz.legend_items
+   
+  
+
 </script>
 
 </edgelegend>

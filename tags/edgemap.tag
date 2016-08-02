@@ -158,6 +158,12 @@
         iconUrl: 'images/Substation.png',
         iconSize: [32, 32],
         })
+      interphase = L.icon({
+        iconUrl: 'images/Interphase_Transformer.png',
+        iconSize: [32, 32],
+        })
+      if feat.properties.gid.startsWith('23') 
+        return L.marker(latlng,{icon: interphase, zIndexOffset: 99}) 
       if feat.properties.gid.startsWith('22') 
         return L.marker(latlng,{icon: transformer, zIndexOffset: 99}) 
       if feat.properties.gid.startsWith('21') 
@@ -188,8 +194,10 @@
       console.log bounds
       nw = xform.forward([bounds.getNorthWest().lng,bounds.getNorthWest().lat])
       se = xform.forward([bounds.getSouthEast().lng,bounds.getSouthEast().lat])
-      url = "/bounds/ABCDEFGH/#{nw[0].toFixed(0)}/#{nw[1].toFixed(0)}/#{se[0].toFixed(0)}/#{se[1].toFixed(0)}/#{@map.getZoom()}"
-      #console.log(url)
+      #toggles = (a.alpha for a in zzzz.legend_items when a.show is yes )
+      toggles = (a.alpha for a in zzzz.legend_items when a.show is yes ).join('')
+      url = "/bounds/#{toggles}/#{nw[0].toFixed(0)}/#{nw[1].toFixed(0)}/#{se[0].toFixed(0)}/#{se[1].toFixed(0)}/#{@map.getZoom()}"
+      console.log(url)
       req = new XMLHttpRequest()
       req.onload = -> 
         #console.log req.responseText

@@ -61,6 +61,7 @@ riot.mount('edgeinfo')
 riot.mount('edgebar')
 riot.mount('edgebug')
 riot.mount('edgeghost')
+riot.mount('material-checkbox')
 
 
 
