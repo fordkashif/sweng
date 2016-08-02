@@ -28,9 +28,6 @@ zzzz.on('zoomOut', -> zzzz.map.zoomOut())
 zzzz.on('showEdgeBar', ->
     document.getElementsByTagName("edgebar")[0].className = "disp"
     document.getElementsByTagName("edgebuttons")[0].className = "hide"
-    riot.route('search')
-   
-    console.log('meet')
     )
 
 zzzz.hideedgebar = -> zzzz.trigger('hideedgebar')
@@ -47,9 +44,9 @@ zzzz.on('hideedgebar', ->
     document.getElementsByTagName("edgebar")[0].className = ""
     document.getElementsByTagName("edgebuttons")[0].className = ""
     zzzz.searchitems = []
-    riot.route('')
+    
     )
-
+    
 @kp = -> alert('boom2')
 
     
@@ -60,9 +57,7 @@ riot.mount('edgeinfo')
 riot.mount('edgebar')
 riot.mount('edgebug')
 riot.mount('edgeghost')
-
-
-
+riot.mount('modaltry')
 
 
 
