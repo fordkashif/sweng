@@ -191,7 +191,10 @@
       riot.route.stop()
       riot.route.start(true)
       riot.route.base('#')
-      riot.route("/#{nw[0].toFixed(0)}/#{nw[1].toFixed(0)}/#{se[0].toFixed(0)}/#{se[1].toFixed(0)}/#{@map.getZoom()}");
+     # riot.route("/#{nw[0].toFixed(0)}/#{nw[1].toFixed(0)}/#{se[0].toFixed(0)}/#{se[1].toFixed(0)}/#{@map.getZoom()}");
+      riot.route("map=#{@map.getZoom()}/", ->
+        map.panTo(new L.LatLng(40.737, -73.923));
+      )
   
   
     else
