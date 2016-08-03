@@ -20,7 +20,8 @@
      
   </style>
   
-  <div id="edgemapdiv" onkeypress={ kp }></div>
+  <div id="edgemapdiv"></div>
+  
 
   <script type="coffeescript">
   jad2k1 = '+proj=lcc +lat_1=18 +lat_0=18 +lon_0=-77 +k_0=1 +x_0=750000 +y_0=650000 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs'
@@ -37,7 +38,7 @@
   L.Icon.Default.imagePath = '/images'
   
   base = {
-    'osm': L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{opacity: .85, maxZoom: 19})
+    'osm': L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{opacity: .75, maxZoom: 19})
     'out': L.tileLayer("https://{s}.tile.thunderforest.com/outdoors/{z}/{x}/{y}.png")
     'cdb': L.tileLayer("http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png")
     }
@@ -216,7 +217,7 @@
   
   
   @map.on('moveend', mapmoved)
-  
+  zzzz.on('mapRefresh', => @map.flyToBounds(@map.getBounds()))
   zzzz.on('mapZoomIn', => @map.zoomIn())
   zzzz.on('mapZoomOut', => @map.zoomOut())
   zzzz.on('flyTo', (indata) => @map.flyToBounds(L.geoJson(indata.geometry)))

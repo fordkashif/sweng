@@ -85,7 +85,7 @@
         </label>
       </td>
       <td>
-        <img if={ name.imgurl } src={ name.imgurl } class={ noshow: name.show }>
+        <img if={ name.imgurl } src={ name.imgurl }>
         <div if={ name.divclas } id="{ name.divclas }"></div>
       </td>
    </tr>
@@ -137,6 +137,7 @@
    zzzz.legend_items[e.item.i].show = not zzzz.legend_items[e.item.i].show
    #riot.update()
    #console.log zzzz.legend_items
+   zzzz.trigger('mapRefresh')
    
   
 

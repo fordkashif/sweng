@@ -87,9 +87,9 @@ def bounds2(toggles,nwx,nwy,sex,sey,z):
     q_transformers_filter = []
     if 'CD' not in toggles:
         if 'C' in toggles:
-            q_isolators_filter.append("mounted = 'POLE")
+            q_transformers_filter.append("mounted = 'POLE'")
         if 'D' in toggles:
-            q_isolators_filter.append("mounted = 'PAD")
+            q_transformers_filter.append("mounted = 'PAD'")
         q_transformers += ' AND ('+' OR '.join(q_transformers_filter) + ')'    
             
     q_isolators = """ 
@@ -149,9 +149,9 @@ def bounds2(toggles,nwx,nwy,sex,sey,z):
         qrys.append(q_interphase)
     if (('F' in toggles or 'G' in toggles or 'H' in toggles or 'I' in toggles or 'J' in toggles or 'K' in toggles) and z > 14) or  ('K' in toggles and z > 11) :
         qrys.append(q_isolators)
-    if 'L' in toggles and z > 17:
+    if 'L' in toggles and z > 16:
         qrys.append(q_streetlamps)
-    if 'M' in toggles and z > 17:
+    if 'M' in toggles and z > 16:
         qrys.append(q_poles)
     
         
