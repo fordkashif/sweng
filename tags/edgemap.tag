@@ -7,7 +7,7 @@
       /*height: 400px;*/
       display: block;
       background-color: grey;
-      transition: left .05s ease-in-out .05s;
+      transition: left .65s ease-in-out .05s;
       position: fixed; left:0; right:0; top:0;bottom:0;
     }
     :scope.disp {left: 450px; transition: left .05s ease-in-out .05s}
@@ -16,11 +16,12 @@
       right: 0px;
       height: 100%;
       opacity: 1;
+      transition: left .05s ease-in-out .05s
     }
-     
+   
   </style>
   
-  <div id="edgemapdiv"></div>
+  <div id="edgemapdiv" class={disp: errup}></div>
   
 
   <script type="coffeescript">
@@ -254,6 +255,14 @@
     )
   zzzz.on('clearCustomers', -> c.clearLayers())
   
+  zzzz.on('reportShow', => 
+    @errup = yes
+    @update()
+    )
+  zzzz.on('reportHide', => 
+    @errup = no
+    @update()
+    )
   
   @on('mount', -> 
       @map.invalidateSize()

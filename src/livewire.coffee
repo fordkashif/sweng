@@ -25,10 +25,7 @@ zzzz.on('showobject', (indata) ->
     )
 zzzz.on('zoomIn', -> zzzz.map.zoomIn())
 zzzz.on('zoomOut', -> zzzz.map.zoomOut())
-zzzz.on('showEdgeBar', ->
-    document.getElementsByTagName("edgebar")[0].className = "disp"
-    document.getElementsByTagName("edgebuttons")[0].className = "hide"
-    )
+
 
 zzzz.bringit_pushitback = -> zzzz.trigger('bringit_pushitback')
 zzzz.on('bringit_pushitback', -> 
@@ -47,12 +44,28 @@ zzzz.on('showLegend', ->
     document.getElementsByTagName("edgelegend")[0].className = "disp"
     )
 
+zzzz.on('showEdgeBar', ->
+    document.getElementsByTagName("edgebar")[0].className = "disp"
+    document.getElementsByTagName("edgebuttons")[0].className = "hide"
+    )
+    
 zzzz.on('hideedgebar', ->
     document.getElementsByTagName("edgebar")[0].className = ""
     document.getElementsByTagName("edgebuttons")[0].className = ""
     zzzz.searchitems = []
-    
     )
+
+zzzz.on('reportShow', ->
+    document.getElementsByTagName("edgereport")[0].className = "disp"
+    document.getElementsByTagName("edgemap")[0].className = "disp"
+    document.getElementsByTagName("edgebuttons")[0].className = "hide"
+    )
+zzzz.on('reportHide', ->
+    document.getElementsByTagName("edgereport")[0].className = ""
+    document.getElementsByTagName("edgemap")[0].className = ""
+    document.getElementsByTagName("edgebuttons")[0].className = ""
+    )
+
 
 riot.mount('edgelegend')    
 riot.mount('edgebuttons')
@@ -61,6 +74,7 @@ riot.mount('edgeinfo')
 riot.mount('edgebar')
 riot.mount('edgebug')
 riot.mount('edgeghost')
+riot.mount('edgereport')
 riot.mount('material-checkbox')
 
 

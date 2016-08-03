@@ -35,6 +35,10 @@
   <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" onclick={ layers }>
     <i class="material-icons">layers</i>  
   </button>
+  
+  <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-button--colored" onclick={ report }>
+    <i class='material-icons'>error_outline</i>
+  </button>
   </div>
   
   <script type="coffeescript">
@@ -45,6 +49,8 @@
   @minZoom = yes
   @zoomin = -> zzzz.trigger('mapZoomIn')
   @zoomout = -> zzzz.trigger('mapZoomOut')
+  @report = -> zzzz.trigger('reportShow') 
+    
   @help = -> 
     alert 'boom'
     zzzz.help.isvisible = yes
