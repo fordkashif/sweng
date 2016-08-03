@@ -1,5 +1,5 @@
 import glob, os, sys, psycopg2, bottle
-from bottle import route, run, template, response, static_file
+from bottle import route, run, template, response, static_file, redirect
 import json
 
 print('************************')
@@ -12,32 +12,180 @@ cnx = psycopg2.connect('dbname=livewire user=rhys password=mikoy@nshamar!3 host=
 def index():
     return '<h1 style="font-size: 40em; text-align:center">@</h1>'
 
-@route('/bounds/<nwx:int>/<nwy:int>/<sex:int>/<sey:int>/<z:int>')
-def bounds(nwx,nwy,sex,sey,z):
+# @route('/bounds/<nwx:int>/<nwy:int>/<sex:int>/<sey:int>/<z:int>')
+# def bounds(nwx,nwy,sex,sey,z):
+#     #/bounds/758007/654406/775445/648123/14
+#     crs = cnx.cursor()
+#     crs.callproc('web.get_payload_live',[nwx,nwy,sex,sey])
+#     txt = crs.fetchone()
+#     return txt
+    
+@route('/bounds/<toggles>/<nwx:int>/<nwy:int>/<sex:int>/<sey:int>/<z:int>')
+def bounds2(toggles,nwx,nwy,sex,sey,z):
     #/bounds/758007/654406/775445/648123/14
     crs = cnx.cursor()
-    crs.callproc('web.get_payload_live',[nwx,nwy,sex,sey])
-    txt = crs.fetchone()
-    return txt
+    # toggles
+    # A - Primaryline 
+    # B - Secondaryline
+    # C - Pad Mounted transformers
+    # D - Pole Mounted transformers
+    # E - Interphase transformers
+    # F - Isolator - Remotely Operated - Closed
+    # G - Isolator - Remotely Operated - Open
+    # H - Isolator - Field Operated - Closed
+    # I - Isolator - Field Operated - Open
+    # J - Isolator Fuse
+    # K - Feeder Recloser
+    # L - Streetlamps
+    # M - Poles
+   
+    
+    q_primary = """
+    select  jsonb_build_object(
+      'GID',
+      CASE 
+       when phasecode = 'ABC' 
+       then ('33'||globalid::text)::int /* Three Phase line*/
+       when phasecode in ('AB','AC','BC') 
+       then ('32'||globalid::text)::int /* Two Phase line*/
+       ELSE ('31'||globalid::text)::int /* Single Phase line*/
+      end)
+      || st_asgeojson(g,0)::jsonb payload from livewire.primaryline 
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5)
+    """
+    
+    q_secondary = """
+    select jsonb_build_object(
+      'GID',
+      ('39'||globalid::text)::int) 
+      || st_asgeojson(g,0)::jsonb payload from livewire.secondaryline 
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5)
+    """
+    
+    q_poles = """
+    select jsonb_build_object(
+      'GID',
+      ('88'||globalid::text)::int) 
+      || st_asgeojson(g,0)::jsonb payload from livewire.pole 
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5) 
+    """
+    q_interphase = """
+    select jsonb_build_object(
+      'GID', ('23'||globalid::text)::int) 
+      || st_asgeojson(g,0)::jsonb payload from livewire.interphase_transformers  
+    """
+    q_transformers = """
+    select jsonb_build_object(
+      'GID',
+      case 
+        when mounted = 'POLE' then ('22'||globalid::text)::int 
+        ELSE ('21'||globalid::text)::int
+      end)
+      || st_asgeojson(g,0)::jsonb payload from livewire.transformerbank
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5) 
+    """
+    q_transformers_filter = []
+    if 'CD' not in toggles:
+        if 'C' in toggles:
+            q_transformers_filter.append("mounted = 'POLE'")
+        if 'D' in toggles:
+            q_transformers_filter.append("mounted = 'PAD'")
+        q_transformers += ' AND ('+' OR '.join(q_transformers_filter) + ')'    
+            
+    q_isolators = """ 
+    select jsonb_build_object(
+      'GID',
+      case 
+        when devicetype = 'FUSE' and status = 'CLOSED' 
+        then ('99'||globalid::text)::int 
+        when devicetype in ('LAB','KS') and status = 'CLOSED' 
+        then ('98'||globalid::text)::int 
+        when devicetype in ('LAB','KS','FUSE') and status = 'OPEN' 
+        then ('97'||globalid::text)::int 
+        when devicetype in ('ALBS', 'PMR','LCB','LBS') and "status" = 'OPEN' 
+        then ('96'||globalid::text)::int 
+        when devicetype in ('ALBS', 'PMR','LCB','LBS') and "status" = 'CLOSED' 
+        then ('95'||globalid::text)::int 
+        when devicetype = 'FDR' then ('94'||globalid::text)::int 
+        ELSE ('93'||globalid::text)::int 
+      end) 
+      || st_asgeojson(g,0)::jsonb payload from livewire.isolators 
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5)
+    """
+    q_isolators_filter = []
+    if 'FGHIJK' not in toggles:
+        if 'F' in toggles:
+            q_isolators_filter.append("devicetype in ('ALBS', 'PMR','LCB','LBS') and status = 'CLOSED'" )
+        if 'G' in toggles:
+            q_isolators_filter.append("devicetype in ('ALBS', 'PMR','LCB','LBS') and status = 'OPEN'" )
+        if 'H' in toggles:
+            q_isolators_filter.append("devicetype in ('LAB','KS') and status = 'CLOSED'" ) 
+        if 'I' in toggles:
+            q_isolators_filter.append("devicetype in ('LAB','KS','FUSE') and status = 'OPEN'")
+        if 'J' in toggles:
+            q_isolators_filter.append(" devicetype = 'FUSE' and status = 'CLOSED'")
+        if 'K' in toggles:
+            q_isolators_filter.append(" devicetype = 'FDR' and status = 'CLOSED'")
+        q_isolators += ' AND ('+' OR '.join(q_isolators_filter) + ')'
+    
+    q_streetlamps = """
+    select jsonb_build_object(
+      'GID',
+      ('44'||globalid::text)::int)
+      || st_asgeojson(g,0)::jsonb payload from livewire.streetlight 
+    where st_dwithin(st_makeenvelope(%(nwx)s,%(nwy)s,%(sex)s,%(sey)s,3448),g,5)
+    """
+    
+    
+    qry = "select json_agg(payload)::text from ( "
+    qrys = []
+    if 'A' in toggles:
+        qrys.append( q_primary)
+    if 'B' in toggles and z > 17:
+        qrys.append(q_secondary)
+    if ('C' in toggles or 'D' in toggles) and z > 16:
+        qrys.append(q_transformers)
+    if 'E' in toggles:
+        qrys.append(q_interphase)
+    if (('F' in toggles or 'G' in toggles or 'H' in toggles or 'I' in toggles or 'J' in toggles or 'K' in toggles) and z > 14) or  ('K' in toggles and z > 11) :
+        qrys.append(q_isolators)
+    if 'L' in toggles and z > 16:
+        qrys.append(q_streetlamps)
+    if 'M' in toggles and z > 16:
+        qrys.append(q_poles)
+    
+        
+    qry += ' UNION ALL '.join(qrys)
+    qry += ") as foo"
+    #print qry
+    print crs.mogrify(qry,{'nwx':nwx,'nwy':nwy,'sex':sex,'sey':sey})
+    crs.execute(qry,{'nwx':nwx,'nwy':nwy,'sex':sex,'sey':sey})
+    return crs.fetchone()
+
+    
+    
+    
+    
+    
 
 @route('/find/transformer/<gid>')
 def find_transformer(gid):
     crs = cnx.cursor()
-    qry = "select (to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Transformer')|| "
-    qry += "jsonb_build_object('cust_info', "
-    qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from  "
-    qry += "(select *,st_asgeojson(g)::json coords from service.location  "
-    qry += "join service.info using (premises) where connectedtransformer =  %(gid)s::text)  "
-    qry += "as foo "
-    qry += "))|| "
-    qry += "jsonb_build_object('lamp_info', "
-    qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from  "
-    qry += "(select *,st_asgeojson(g)::json coords from livewire.streetlight  "
-    qry += "where connectedtransformer =  %(gid)s::int)  "
-    qry += "as foo "
-    qry += ")))::text " 
-    qry += "from (select *,st_x(g), st_y(g) from livewire.transformerbank  "
-    qry += "where globalid =  %(gid)s::int ) as foo; "
+    # qry = "select (to_jsonb(foo.*) - 'g' ||jsonb_build_object('layer','Transformer')|| "
+    # qry += "jsonb_build_object('cust_info', "
+    # qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from  "
+    # qry += "(select *,st_asgeojson(g)::json coords from service.location  "
+    # qry += "join service.info using (premises) where connectedtransformer =  %(gid)s::text)  "
+    # qry += "as foo "
+    # qry += "))|| "
+    # qry += "jsonb_build_object('lamp_info', "
+    # qry += "(select json_agg(row_to_json(foo.*)::jsonb - 'g')::jsonb from  "
+    # qry += "(select *,st_asgeojson(g)::json coords from livewire.streetlight  "
+    # qry += "where connectedtransformer =  %(gid)s::int)  "
+    # qry += "as foo "
+    # qry += ")))::text " 
+    # qry += "from (select *,st_x(g), st_y(g) from livewire.transformerbank  "
+    # qry += "where globalid =  %(gid)s::int ) as foo; "
     qry = """select (
               to_jsonb(foo.*) - 'g' 
               || jsonb_build_object('layer','Transformer')
@@ -89,6 +237,7 @@ def find_pole(gid):
     txt = crs.fetchone()
     return txt
 
+
 @route('/find/premises/<prem>')
 def find_premises(prem):
     crs = cnx.cursor()
@@ -113,7 +262,7 @@ def find_premises(prem):
 #     crs.execute(qry,(gid,))
 #     return crs.fetchone()
     
-@route('/search/<num>')
+@route('/search/<num:re:[0-9]+>')
 def errbodylook(num):
     crs = cnx.cursor()
     qry = """
@@ -134,11 +283,38 @@ def errbodylook(num):
         from (select * from livewire.pole where polenumber ~* %(bam)s limit 5) as foo)
         select json_agg(payload)::text from one
         """
-    num = '^' + num
+    num = '^' + str(num)
     crs.execute(qry,{'bam':num})
     out = crs.fetchone()[0]
     #print 'len is: ' + str(len(out))
     return out
+
+@route('/search/<word>')
+def wordsearch(word):
+    crs = cnx.cursor()
+    qry = "select json_agg(row_to_json(foo.*)::jsonb || "
+    qry += "jsonb_build_object('layer', 'Service_name'))::text from "
+    qry += "(select * from service.info where "
+    
+    #qry = """select * from service.info where """
+    q = ['service_name ~* %s' for nn in word.split(' ')]
+    qry =  qry + ' and '.join(q) + ' limit 10) as foo'
+    print crs.mogrify(qry,word.split(' '))
+    crs.execute(qry,word.split(' '))
+    return crs.fetchone()[0]
+    
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -152,11 +328,14 @@ def images(image):
     return static_file(image,'www/images/')
 
 
+@route('/map/')
+def map_():
+    redirect("/map")
 
 @route('/map')
-@route('/map/')
 def map():
     return template('www/index.html')
+   
 @route('/livewire.css')
 @route('/map/livewire.css')
 def legend():

@@ -16,10 +16,15 @@
   <div if={ opts.info.layer === 'Poles' }>
     Pole: {opts.info.facilityid} | {opts.info.polenumber}
   </div>
-  
+  <div if={ opts.info.layer === 'Service_name' }>
+    Premises: {opts.info.premises} | {opts.info.service_name}
+    <br>
+    Address: {opts.info.service_address}
+    
+  </div>
   <script type="coffeescript">
   #console.log(opts.info)
-  #console.log(opts.info.layer)
+
   
   </script>
 </answer-box>

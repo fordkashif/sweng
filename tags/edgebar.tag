@@ -84,7 +84,7 @@
     
     @results = =>
       
-      if @searchbox.value is 0
+      if @searchbox.value.length is 0
         return @searchitems = []
       #if @searchbox.value.length in [1..3]
       #  return @searchitems = (q for q in feeders.features when q.properties.Name.match(new RegExp(@searchbox.value, 'i')))

@@ -58,7 +58,9 @@ gulp.task 'joinup', ->
     'node_modules/material-design-lite/material.js',
     'make_modules/leaflet/leaflet-src.js',
     'node_modules/proj4/dist/proj4-src.js',
-    'make_modules/proj4leaflet/proj4leaflet.js'
+    'make_modules/proj4leaflet/proj4leaflet.js',
+    'make_modules/leafletHeat/HeatLayer.js',
+    'node_modules/riot-mui/build/js/riot-mui.js'
     ]
     .pipe concat('tools.js')
     .pipe uglify()

@@ -174,22 +174,29 @@
     @shoeCust = 0
     url = ''
     console.log "infoFeature: #{JSON.stringify(infoFeature)}"
-    if 'layer' of infoFeature
+    if 'layer' of infoFeature # handles requests form the search bar
       if infoFeature.layer is "Transformer"
         url = "/find/transformer/#{infoFeature.globalid}"
       if infoFeature.layer is "Streetlight"
         url = "/find/streetlight/#{infoFeature.globalid}"
       if infoFeature.layer is "Isolators"
         url = "/find/isolator/#{infoFeature.globalid}"
-      if infoFeature.layer is "Service Location"
+      if infoFeature.layer in ["Service Location","Service_name"]
         url = "/find/premises/#{infoFeature.premises}"
       if infoFeature.layer is "Poles"
         url = "/find/pole/#{infoFeature.globalid}"
-    else
+    else # handles requests from the map click
+      console.log infoFeature
       if infoFeature.gid.startsWith('2')
         url = "/find/transformer/#{infoFeature.gid.slice(2)}"
       if infoFeature.gid.startsWith('9')
         url = "/find/isolator/#{infoFeature.gid.slice(2)}"
+      if infoFeature.gid.startsWith('4')
+        url = "/find/streetlight/#{infoFeature.gid.slice(2)}"
+      if infoFeature.gid.startsWith('8')
+        url = "/find/pole/#{infoFeature.gid.slice(2)}"
+        
+        
     req = new XMLHttpRequest()
     console.log "url: #{url}"
     req.onload = => 
